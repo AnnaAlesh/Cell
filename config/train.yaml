@@ -1,0 +1,47 @@
+seed: 42
+output_dir: ${hydra:runtime.output_dir}
+logdir: logs/
+checkpoint: null  # путь к чекпоинту для возобновления обучения
+
+datamodule:
+  datadir: data/yeast_cell_in_microstructures_dataset
+  batch_size: 32
+  train_subdir: train
+  val_subdir: val
+  test_subdir: test
+
+model:
+  name: unet                       # unet | tiny_unet
+  n_channels: 1
+  n_classes: 3
+  channel_sizes: [16, 32, 64, 128]
+  bilinear: true
+
+optimizer:
+  lr: 0.001
+  weight_decay: 0.0
+
+loss:
+  name: cross_entropy              # cross_entropy (после Задания 1 будет доступен soft_dice; после Задания 4 — focal)
+  smooth: 1.0e-6                   # для soft_dice (Задание 1)
+  gamma: 2.0                       # для focal (Задание 4)
+  alpha: null                      # для focal (Задание 4); null = без взвешивания классов
+
+trainer:
+  accelerator: auto                # cpu | gpu | mps | auto
+  devices: 1
+  max_epochs: 10
+  log_every_n_steps: 10
+
+early_stopping:
+  enabled: false                   # остановить обучение, если val/loss не улучшается
+  patience: 10
+  monitor: val/loss
+  mode: min
+
+hydra:
+  run:
+    dir: ${logdir}/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${logdir}/multiruns/${now:%Y-%m-%d}/${now:%H-%M-%S}/
+    subdir: ${hydra.job.override_dirname}

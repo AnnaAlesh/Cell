@@ -1,0 +1,44 @@
+seed: 42
+output_dir: ${hydra:runtime.output_dir}
+logdir: logs/
+checkpoint: null
+
+data:
+  datadir: data/yeast_cell_in_microstructures_dataset
+  batch_size: 32
+  anchors: [[48, 72]]              # размер якорей в пикселях [w, h]
+  image_size: 256
+  grid_size: 8
+  ignore_iou_thresh: 0.5
+  train_subdir: train
+  val_subdir: val
+  test_subdir: test
+
+model:
+  in_channels: 1
+  num_classes: 2
+
+optimizer:
+  lr: 0.001
+  weight_decay: 0.001
+
+trainer:
+  accelerator: auto
+  devices: 1
+  max_epochs: 50
+  log_every_n_steps: 10
+
+early_stopping:
+  enabled: false                    # остановить обучение, если val/map не улучшается
+  patience: 10
+  monitor: val/map
+  mode: max
+
+nms_iou_threshold: 0.3              # для расчёта mAP
+
+hydra:
+  run:
+    dir: ${logdir}/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${logdir}/multiruns/${now:%Y-%m-%d}/${now:%H-%M-%S}/
+    subdir: ${hydra.job.override_dirname}

@@ -1,0 +1,15 @@
+[flake8]
+exclude = .env*,.venv*,.git
+# Black line length, see
+# https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html
+max-line-length = 100
+# See https://en.wikipedia.org/wiki/Cyclomatic_complexity
+max-complexity = 5
+# Ignores the following errors:
+# - E203 whitespace before ':'
+# - W503 line break before binary operator
+#   See https://github.com/PyCQA/pycodestyle/issues/197#issuecomment-219742628
+#   and https://github.com/psf/black/issues/113
+ignore = W503 E203
+# See https://stackoverflow.com/questions/8427701/how-to-ignore-pyflakes-errors-imported-but-unused-in-the-init-py-file
+per-file-ignores = __init__.py:F401

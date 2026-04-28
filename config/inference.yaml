@@ -1,0 +1,36 @@
+defaults:
+  - _self_
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+checkpoint: weights/epoch_054.ckpt
+
+datamodule:
+  datadir: data/yeast_cell_in_microstructures_dataset
+  batch_size: 32
+  train_subdir: train
+  val_subdir: val
+  test_subdir: test
+
+# Модель должна совпадать с моделью из чекпоинта.
+model:
+  name: unet
+  n_channels: 1
+  n_classes: 3
+  channel_sizes: [16, 32, 64, 128]
+  bilinear: true
+
+# Loss для test_step требует валидной функции, выбор не влияет на метрики.
+loss:
+  name: cross_entropy
+  smooth: 1.0e-6
+
+trainer:
+  accelerator: auto
+  devices: 1
+  log_every_n_steps: 10
