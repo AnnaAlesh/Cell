@@ -3,6 +3,7 @@ from omegaconf import DictConfig
 
 from cell_segmentation.model.modules import UNet
 from cell_segmentation.model.tiny_unet import UNet as TinyUNet
+from cell_segmentation.utils.losses import SoftDiceLoss
 
 MODELS = {
     "unet": UNet,
@@ -26,6 +27,7 @@ def build_loss(cfg: DictConfig) -> torch.nn.Module:
     name = cfg.loss.name
     if name == "cross_entropy":
         return torch.nn.CrossEntropyLoss()
-    # Задание 1: добавьте поддержку soft_dice (см. cell_segmentation.utils.losses.SoftDiceLoss).
+    if name == "soft_dice":
+        return SoftDiceLoss(num_classes=cfg.model.n_classes, smooth=cfg.loss.smooth)
     # Задание 3 (вариант с focal loss): добавьте сюда соответствующую ветку.
     raise ValueError(f"unknown loss: {name}")
